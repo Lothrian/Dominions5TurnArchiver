@@ -1,0 +1,8 @@
+dominionsExecutablePath=Test
+saveDirectoryPath=Test
+extractMapFiles=Test
+mapDirectoryPath=Test
+
+longTermStorageDirectory=Test
+readyArchiveDuration=Test
+useLongTermStorage=Test
