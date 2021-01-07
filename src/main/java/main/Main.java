@@ -33,6 +33,8 @@ public class Main {
      */
     public static Dom5ArchiverLogger logWriter;
     private File archiverJarDirectory;
+    private boolean launchGame;
+    private boolean createLog;
 
     /*
 	Required Options
@@ -54,7 +56,9 @@ public class Main {
     private ArrayList<String> whitelist;
     private ArrayList<String> blacklist;
 
-    public void run(String[] args) {
+    public void run(boolean launchGame, boolean createLog) {
+	this.launchGame = launchGame;
+	this.createLog = createLog;
 	/*
 	    Initialise values
 	 */
@@ -66,7 +70,8 @@ public class Main {
 	/*
 	    Execute game
 	 */
-	runDominions();
+	if(this.launchGame)runDominions();
+	
 	/*
 	    Read Turns from directories
 	 */
@@ -86,7 +91,7 @@ public class Main {
 		game.doArchiving();
 		Main.logWriter.log("Finished archiving game " + game.getName());
 	    }else {
-		logWriter.startNewSection("Skipped because of black/whitelist");
+		logWriter.log("Skipped because of black/whitelist");
 	    }
 	}
 	logWriter.startNewSection("FINISHED ARCHIVING SUCCESSFULLY");
@@ -165,12 +170,11 @@ public class Main {
     public void initialiseAdmin() {
 	archiverJarDirectory = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getParentFile();
 
-	logWriter = new Dom5ArchiverLogger(new File(archiverJarDirectory + "\\Log.txt"));
+	logWriter = new Dom5ArchiverLogger(new File(archiverJarDirectory + "\\Log.txt"), this.createLog);
     }
 
     public void logConfigs() {
 	logWriter.log("archiverJarDirectory:" + this.archiverJarDirectory);
-	logWriter.log("blacklist:" + this.blacklist);
 	logWriter.log("dominionsExecutablePath:" + this.dominionsExecutablePath);
 	logWriter.log("extractMapFiles:" + this.extractMapFiles);
 	logWriter.log("longTermStorageDirectory:" + this.longTermStorageDirectory);
@@ -180,7 +184,16 @@ public class Main {
 	logWriter.log("useLongTermStorage:" + this.useLongTermStorage);
 	logWriter.log("archiveNameShema:" + this.archiveNameShema);
 	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberMinimumlength);
-	logWriter.log("whitelist:" + this.whitelist);
+	String acc = "";
+	for(String s : this.blacklist) {
+	    acc += s + ";";
+	}
+	logWriter.log("blacklist:" + acc);
+	acc = "";
+	for(String s : this.whitelist) {
+	    acc += s + ";";
+	}
+	logWriter.log("whitelist:" + acc);
     }
 
     private void logFinalConfigs() {
@@ -314,11 +327,12 @@ public class Main {
 
     public void readBlackWhitelist(ArrayList<String> list, File toRead) {
 	Scanner read;
-	list = new ArrayList<>();
 	try {
 	    read = new Scanner(toRead);
 	    while (read.hasNext()) {
-		list.add(read.nextLine());
+		String tmp = read.nextLine();
+		logWriter.log("Adding " + tmp + " to list");
+		list.add(tmp);
 	    }
 	    read.close();
 	} catch (FileNotFoundException ex) {
@@ -345,6 +359,18 @@ public class Main {
     }
 
     public static void main(String[] args) {
-	new Main().run(args);
+	boolean runGame = true;
+	boolean createLog = false;
+	for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-a")) {
+                runGame = false;
+                continue;
+            }
+            if (args[i].equals("-l")) {
+                createLog = true;
+                continue;
+            }
+        }
+	new Main().run(runGame, createLog);
     }
 }

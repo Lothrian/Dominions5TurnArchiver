@@ -22,48 +22,59 @@ public class Dom5ArchiverLogger {
 
     private JFrame errorMessagePanel;
     private Writer logWriter;
+    private boolean active;
 
-    public Dom5ArchiverLogger(File logFile) {
+    public Dom5ArchiverLogger(File logFile, boolean active) {
 	this.errorMessagePanel = new JFrame();
 	this.errorMessagePanel.setResizable(true);
 
-	if (!logFile.exists()) {
+	this.active = active;
+
+	if (active) {
+	    if (!logFile.exists()) {
+		try {
+		    logFile.createNewFile();
+		} catch (IOException ex) {
+		    JOptionPane.showMessageDialog(errorMessagePanel, "Could not create log file at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+		    System.exit(0);
+		}
+	    }
+
 	    try {
-		logFile.createNewFile();
+		logWriter = new FileWriter(logFile, false);
 	    } catch (IOException ex) {
-		JOptionPane.showMessageDialog(errorMessagePanel, "Could not create log file at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(errorMessagePanel, "Could not log file writer at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
 		System.exit(0);
 	    }
-	}
-	
-	try {
-	    logWriter = new FileWriter(logFile, false);
-	} catch (IOException ex) {
-	    JOptionPane.showMessageDialog(errorMessagePanel, "Could not log file writer at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
-	    System.exit(0);
 	}
     }
 
     public void log(String text) {
-	try {
-	    logWriter.write(text + " ;" + System.getProperty("line.separator"));
-	    logWriter.flush();
-	} catch (IOException ex) {
-	    JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
-	    System.exit(0);
+	if (this.active) {
+	    try {
+		logWriter.write(text + " ;" + System.getProperty("line.separator"));
+		logWriter.flush();
+	    } catch (IOException ex) {
+		JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
+		System.exit(0);
+	    }
 	}
     }
 
     public void error(String text) {
-	this.log("ERROR: " + text);
-	try {
-	    logWriter.close();
-	} catch (IOException ex) {
-	    JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
+	if (this.active) {
+	    this.log("ERROR: " + text);
+	    try {
+		logWriter.close();
+	    } catch (IOException ex) {
+		JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
+	    }
+	} else {
+	    JOptionPane.showMessageDialog(errorMessagePanel, "ERROR: " + text);
 	}
 	System.exit(0);
     }
-    
+
     public void startNewSection(String title) {
 	this.log("--------------");
 	this.log(title + ":");

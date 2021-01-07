@@ -1,5 +1,4 @@
 
-
 -----------------------
 Config Options:
 REQUIRED:
@@ -15,3 +14,8 @@ OPTIONAL:
 /Currently not active/-useLongTermStorage: [true/false] determines what is done with turns outdated according to readyArchiveDuration. True means they will be moved to another directory, false means they will be unrecoverably deleted, CAUTION, Default: false
 -longTermStorageDirectory: Path to the directory where outdated turns shall be archived. Only used when useLongTermStorage=true
 -----------------------
+Arguments:
+-a Do not launch Dominions
+-l Create a log file
+
+
