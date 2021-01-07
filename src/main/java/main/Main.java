@@ -28,6 +28,8 @@ import javax.swing.JOptionPane;
  */
 public class Main {
 
+    public static String version = "1.0";
+    
     /*
 	Internals
      */
