@@ -66,7 +66,7 @@ public class Main {
 	/*
 	    Execute game
 	 */
-	//runDominions();
+	runDominions();
 	/*
 	    Read Turns from directories
 	 */
