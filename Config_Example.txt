@@ -2,7 +2,6 @@
 dominionsExecutablePath=D:\Programme\Steam\steamapps\common\Dominions5\Dominions5.exe
 extractMapFiles=false
 
-longTermStorageDirectory=D:\Freizeit\Gamedata\Dominions_Manuals\GameArchive
 readyArchiveDuration=5
 useLongTermStorage=true
 archiveNameShema = %name%_%turn%

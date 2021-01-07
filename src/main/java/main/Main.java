@@ -218,6 +218,7 @@ public class Main {
 	this.useLongTermStorage = false;
 	this.archiveNameShema = "%name%%turn%";
 	this.archiveTurnNumberMinimumlength = 2;
+	this.dominionsExecutablePath = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dominions5\\Dominions5.exe");
 	this.logInitialConfigs();
     }
 
@@ -308,7 +309,7 @@ public class Main {
     }
 
     public void sanityCheckConfigs() {
-	this.logWriter.startNewSection("CHECKING REQUIRED CONFIG");
+	this.logWriter.startNewSection("CHECKING CONFIGS FOR DETECTED PROBLEMS");
 
 	this.checkExistence(this.dominionsExecutablePath, "DominionsExecutable");
 	this.checkExistence(this.saveDirectoryPath, "SaveFilesDirectory");
