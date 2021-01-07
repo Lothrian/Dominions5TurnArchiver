@@ -43,12 +43,13 @@ public class Main {
 	Optional Options
      */
     private File saveDirectoryPath;
-    private boolean extractMapFiles = false;
+    private boolean extractMapFiles;
     private File mapDirectoryPath;
-    private String nameshema = "%name%_%turn% 2";
+    private String archiveNameShema;
+    private int archiveTurnNumberMinimumlength;
     private File longTermStorageDirectory;
     private int readyArchiveDuration = -1;
-    private boolean useLongTermStorage = false;
+    private boolean useLongTermStorage ;
 
     private ArrayList<String> whitelist;
     private ArrayList<String> blacklist;
@@ -124,7 +125,7 @@ public class Main {
 		}
 	    }
 	    if (isNewGame) {
-		Game g = new Game(gameName);
+		Game g = new Game(gameName, this.archiveNameShema, this.archiveTurnNumberMinimumlength);
 		games.add(g);
 		g.registerTurn(turn);
 	    }
@@ -176,6 +177,8 @@ public class Main {
 	logWriter.log("readyArchiveDuration:" + this.readyArchiveDuration);
 	logWriter.log("saveDirectoryPath:" + this.saveDirectoryPath);
 	logWriter.log("useLongTermStorage:" + this.useLongTermStorage);
+	logWriter.log("archiveNameShema:" + this.archiveNameShema);
+	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberMinimumlength);
 	logWriter.log("whitelist:" + this.whitelist);
     }
 
@@ -199,6 +202,8 @@ public class Main {
 	this.readyArchiveDuration = -1;
 	this.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
 	this.useLongTermStorage = false;
+	this.archiveNameShema = "%name%_%turn%";
+	this.archiveTurnNumberMinimumlength = 2;
 	this.logInitialConfigs();
     }
 
@@ -265,7 +270,7 @@ public class Main {
 		logWriter.error("MapDirectoryPath does not exist: " + mapDirectoryPath.getAbsolutePath());
 	    }
 	} else if (key.matches("nameshema")) {
-	    nameshema = value;
+	    archiveNameShema = value;
 	} else if (key.matches("longTermStorageDirectory")) {
 	    longTermStorageDirectory = new File(value);
 	    if (!longTermStorageDirectory.exists()) {
@@ -281,6 +286,8 @@ public class Main {
 	    } else {
 		logWriter.error("Could not interprete useLongTermStorage, does not match either true or false: " + value);
 	    }
+	}else if (key.matches("archiveTurnNumberMinimumlength")) {
+	    this.archiveTurnNumberMinimumlength = Integer.parseInt(value);
 	} else {
 	    logWriter.log("Could not identify key:" + key);
 	}

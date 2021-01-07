@@ -37,10 +37,6 @@ public class Turn {
 	return this.turnNumber;
     }
     
-    public boolean isArchived() {
-	return false;
-    }
-    
     public void archive() {
 	
     }
@@ -55,6 +51,10 @@ public class Turn {
     
     public void extractMapFile(File mapDirectory) {
 	
+    }
+    
+    public String getDirectoryName() {
+	return this.directory.getName();
     }
     
     private File findATurnFile() {
