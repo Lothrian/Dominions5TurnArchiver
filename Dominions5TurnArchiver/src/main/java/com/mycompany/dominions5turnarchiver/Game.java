@@ -6,6 +6,7 @@
 package com.mycompany.dominions5turnarchiver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -13,19 +14,31 @@ import java.util.ArrayList;
  */
 public class Game {
     
-    protected ArrayList<Turn> turns;
+    protected HashMap<Integer, Turn> turns;
     protected int numberOfDirectlyAccessibleArchivedGames;
+    protected String name;
+
+    public Game(String name) {
+	turns = new HashMap<>();
+	this.name = name;
+	Main.logWriter.log("Creating new Game with Name: " + name);
+    }
     
     public String getName() {
-	return "";
+	return this.name;
     }
     
     public void doArchiving() {
-	
+	Main.logWriter.startNewSection("archiving");
     }
     
     public void doLongTimeStoraging() {
 	
+    }
+    
+    public void registerTurn(Turn newTurn){
+	turns.put(newTurn.getTurnNumber(), newTurn);
+	Main.logWriter.log("Registered Turn " + newTurn.getTurnNumber() + " to game " + this.name);
     }
     
 }

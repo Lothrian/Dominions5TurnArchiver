@@ -23,8 +23,9 @@ public class Dom5ArchiverLogger {
     private JFrame errorMessagePanel;
     private Writer logWriter;
 
-    public Dom5ArchiverLogger(JFrame errorMessagePanel, File logFile) {
-	this.errorMessagePanel = errorMessagePanel;
+    public Dom5ArchiverLogger(File logFile) {
+	this.errorMessagePanel = new JFrame();
+	this.errorMessagePanel.setResizable(true);
 
 	if (!logFile.exists()) {
 	    try {
@@ -61,6 +62,11 @@ public class Dom5ArchiverLogger {
 	    JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
 	}
 	System.exit(0);
+    }
+    
+    public void startNewSection(String title) {
+	this.log("--------------");
+	this.log(title + ":");
     }
 
 }
