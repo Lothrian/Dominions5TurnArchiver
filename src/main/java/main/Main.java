@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.dominions5turnarchiver;
+package main;
 
-import static com.mycompany.dominions5turnarchiver.Main.logWriter;
+import static main.Main.logWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
