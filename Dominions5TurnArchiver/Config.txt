@@ -1,8 +1,7 @@
-dominionsExecutablePath=Test
-saveDirectoryPath=Test
-extractMapFiles=Test
-mapDirectoryPath=Test
 
-longTermStorageDirectory=Test
-readyArchiveDuration=Test
-useLongTermStorage=Test
+dominionsExecutablePath=D:\Programme\Steam\steamapps\common\Dominions5\Dominions5.exe
+extractMapFiles=false
+
+longTermStorageDirectory=D:\Freizeit\Gamedata\Dominions_Manuals\GameArchive
+readyArchiveDuration=5
+useLongTermStorage=true

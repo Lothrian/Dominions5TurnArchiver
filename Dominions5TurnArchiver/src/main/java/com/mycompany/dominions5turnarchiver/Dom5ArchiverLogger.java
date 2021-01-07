@@ -26,6 +26,15 @@ public class Dom5ArchiverLogger {
     public Dom5ArchiverLogger(JFrame errorMessagePanel, File logFile) {
 	this.errorMessagePanel = errorMessagePanel;
 
+	if (!logFile.exists()) {
+	    try {
+		logFile.createNewFile();
+	    } catch (IOException ex) {
+		JOptionPane.showMessageDialog(errorMessagePanel, "Could not create log file at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+		System.exit(0);
+	    }
+	}
+	
 	try {
 	    logWriter = new FileWriter(logFile, false);
 	} catch (IOException ex) {
@@ -36,14 +45,14 @@ public class Dom5ArchiverLogger {
 
     public void log(String text) {
 	try {
-	    logWriter.write(text + System.getProperty("line.separator"));
+	    logWriter.write(text + " ;" + System.getProperty("line.separator"));
 	    logWriter.flush();
 	} catch (IOException ex) {
 	    JOptionPane.showMessageDialog(errorMessagePanel, ex.getMessage());
 	    System.exit(0);
 	}
     }
-    
+
     public void error(String text) {
 	this.log("ERROR: " + text);
 	try {

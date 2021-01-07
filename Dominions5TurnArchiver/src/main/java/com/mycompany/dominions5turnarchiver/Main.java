@@ -61,9 +61,11 @@ public class Main {
 	this.readConfig();
 	this.readBlackWhitelist(whitelist, new File(archiverJarDirectory + "\\Whitelist.txt"));
 	this.readBlackWhitelist(blacklist, new File(archiverJarDirectory + "\\Blacklist.txt"));
+	this.logConfigs();
 	this.checkRequiredConfig();
 	
-
+	
+	    
 
 	/*
 	    Execute game
@@ -94,12 +96,10 @@ public class Main {
     public void initialiseAdmin() {
 	defaultDominionsDataPath = new File(System.getenv("APPDATA") + "\\Dominions5");
 	archiverJarDirectory = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getParentFile();
-
 	errorMessagePanel = new JFrame();
 	errorMessagePanel.setResizable(true);
-
-	logWriter = new Dom5ArchiverLogger(errorMessagePanel, new File(archiverJarDirectory + "Log.txt"));
-
+	
+	logWriter = new Dom5ArchiverLogger(errorMessagePanel, new File(archiverJarDirectory + "\\Log.txt"));
     }
 
     public void logConfigs() {
@@ -120,12 +120,12 @@ public class Main {
     
     public void readConfig() {
 
-	File configFile = new File(archiverJarDirectory + "Config.txt");
+	File configFile = new File(archiverJarDirectory + "\\Config.txt");
 	Scanner read;
 
 	try {
 	    read = new Scanner(configFile);
-	    read.useDelimiter("$");
+	    read.useDelimiter("[\n\r]");
 	    String argumentPattern = "(.*)=(.*)";
 	    Matcher matcher;
 	    while (read.hasNext()) {
@@ -137,27 +137,27 @@ public class Main {
 		    processConfigEntry(key, value);
 
 		} else {
-		    logWriter.log("Configfile line did not match expected pattern:" + line);
+		    logWriter.log("Configfile line did not match expected pattern: " + line);
 
 		}
 
 	    }
 
 	} catch (FileNotFoundException ex) {
-	    logWriter.error("Could not find Config File" + configFile.getAbsolutePath());
+	    logWriter.error("Could not find Config File at: " + configFile.getAbsolutePath());
 	}
     }
 
     public void processConfigEntry(String key, String value) {
 	logWriter.log("Processing Config for key:" + key + "; value:" + value);
 	if (key.matches("dominionsExecutablePath")) {
-	    dominionsExecutablePath = new File(value);
+	    this.dominionsExecutablePath = new File(value);
 	    if (!dominionsExecutablePath.exists()) {
 		logWriter.error("Could not find Dominions executable at: " + dominionsExecutablePath.getAbsolutePath());
 	    }
 	} else if (key.matches("saveDirectoryPath")) {
 	    saveDirectoryPath = new File(value);
-	    if (!dominionsExecutablePath.exists()) {
+	    if (!saveDirectoryPath.exists()) {
 		logWriter.error("SavefileDirectoryPath does not exist: " + saveDirectoryPath.getAbsolutePath());
 	    }
 	} else if (key.matches("extractMapFiles")) {
@@ -196,7 +196,8 @@ public class Main {
     }
     
     public void checkRequiredConfig() {
-	if(dominionsExecutablePath == null) {
+	logWriter.log(this.dominionsExecutablePath.getAbsolutePath());
+	if(this.dominionsExecutablePath == null) {
 	    logWriter.error("dominionsExecutablePath config not set");
 	}
     }
@@ -212,8 +213,9 @@ public class Main {
 	    }
 	    read.close();
 	} catch (FileNotFoundException ex) {
+	    logWriter.log("Could not read Black/Whitelist from " + toRead + "; " + ex.getMessage());
 	}
-    }
+    } 
 
     /**
      * Runs the Dominions application and waits for it to close
