@@ -10,6 +10,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -38,7 +42,13 @@ public class Turn {
     }
     
     public void archive() {
-	
+	try {
+	    File archiveDirectory = new File(this.directory.getParent() + "\\" + this.getNameOfArchiveDirectory());
+	    Main.logWriter.log("Archiving " + this.directory + " to " + archiveDirectory);
+	    copyFolder(this.directory, archiveDirectory);
+	} catch (IOException ex) {
+	    Main.logWriter.error("failed to copy: " + ex.getMessage());
+	}
     }
     
     public void moveToLongTimeStorage() {
@@ -55,6 +65,11 @@ public class Turn {
     
     public String getDirectoryName() {
 	return this.directory.getName();
+    }
+    
+    public String getNameOfArchiveDirectory() {
+	String specificShemaExpectedTurnNumber = String.format("%1$" + Main.archiveTurnNumberMinimumlength + "s", Integer.toString(this.getTurnNumber())).replace(' ', '0');
+	return Main.archiveNameShema.replaceAll("%turn%", specificShemaExpectedTurnNumber).replaceAll("%name%", this.gameName);
     }
     
     private File findATurnFile() {
@@ -114,6 +129,38 @@ public class Turn {
 	    Main.logWriter.error("Failed reading file " + trnFile.getAbsolutePath());
         }
         return "";
+    }
+    
+    /**
+     * Copies a folder somewhere else Credit goes to https://howtodoinjava.com/java/io/how-to-copy-directories-in-java/
+     *
+     * @param sourceFolder
+     * @param destinationFolder
+     * @throws IOException
+     */
+    private static void copyFolder(File sourceFolder, File destinationFolder) throws IOException {
+        //Check if sourceFolder is a directory or file
+        //If sourceFolder is file; then copy the file directly to new location
+        if (sourceFolder.isDirectory()) {
+            //Get all files from source directory
+            String files[] = sourceFolder.list();
+
+            //Iterate over all files and copy them to destinationFolder one by one
+            for (String file : files) {
+                File srcFile = new File(sourceFolder, file);
+                File destFile = new File(destinationFolder, file);
+
+		if(!destFile.exists()) destFile.mkdirs();
+		    
+                //Recursive function call
+                copyFolder(srcFile, destFile);
+            }
+        } else {
+            //Copy the file content from one place to another
+            if(!sourceFolder.toPath().equals(destinationFolder.toPath())) {
+                Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
     }
     
 }

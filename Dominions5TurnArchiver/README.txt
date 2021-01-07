@@ -6,7 +6,7 @@ REQUIRED:
 -dominionsExecutablePath: Path to the Dominions executable
 
 OPTIONAL:
--nameshema: nameshema for archived games %name% is replaced with the game name, %turn% is replaced with the turn number
+-archiveNameShema: shema for directories of archived games %name% is replaced with the game name, %turn% is replaced with the turn number
 -archiveTurnNumberMinimumlength: The minimum amount of characters used to denote turn number in archived games. Impacts sorting in the list ingame. Default:2
 -saveDirectoryPath: Path to the savedgames-directory if non-default
 /Currently not active/-extractMapFiles: [true/false] wether map files hall be extracted and moved to the maps-directory, Default: false

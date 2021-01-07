@@ -38,15 +38,15 @@ public class Main {
 	Required Options
      */
     private File dominionsExecutablePath;
-
+    
     /*
 	Optional Options
      */
     private File saveDirectoryPath;
     private boolean extractMapFiles;
     private File mapDirectoryPath;
-    private String archiveNameShema;
-    private int archiveTurnNumberMinimumlength;
+    public static String archiveNameShema;
+    public static int archiveTurnNumberMinimumlength;
     private File longTermStorageDirectory;
     private int readyArchiveDuration = -1;
     private boolean useLongTermStorage ;
@@ -84,6 +84,7 @@ public class Main {
 	    logWriter.startNewSection("ARCHIVING GAME " + game.getName());
 	    if(shallBeArchivedBasedOnBlackWhiteList(game)){
 		game.doArchiving();
+		Main.logWriter.log("Finished archiving game " + game.getName());
 	    }else {
 		logWriter.startNewSection("Skipped because of black/whitelist");
 	    }
@@ -125,7 +126,7 @@ public class Main {
 		}
 	    }
 	    if (isNewGame) {
-		Game g = new Game(gameName, this.archiveNameShema, this.archiveTurnNumberMinimumlength);
+		Game g = new Game(gameName);
 		games.add(g);
 		g.registerTurn(turn);
 	    }
@@ -202,7 +203,7 @@ public class Main {
 	this.readyArchiveDuration = -1;
 	this.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
 	this.useLongTermStorage = false;
-	this.archiveNameShema = "%name%_%turn%";
+	this.archiveNameShema = "%name%%turn%";
 	this.archiveTurnNumberMinimumlength = 2;
 	this.logInitialConfigs();
     }
@@ -228,8 +229,8 @@ public class Main {
 		String line = read.next();
 		matcher = Pattern.compile(argumentPattern).matcher(line);
 		if (matcher.matches()) {
-		    String key = matcher.group(1).replaceAll(" ", "");
-		    String value = matcher.group(2).replaceAll(" ", "");
+		    String key = matcher.group(1).trim();
+		    String value = matcher.group(2).trim();
 		    processConfigEntry(key, value);
 
 		} else {
@@ -269,7 +270,7 @@ public class Main {
 	    if (!mapDirectoryPath.exists()) {
 		logWriter.error("MapDirectoryPath does not exist: " + mapDirectoryPath.getAbsolutePath());
 	    }
-	} else if (key.matches("nameshema")) {
+	} else if (key.matches("archiveNameShema")) {
 	    archiveNameShema = value;
 	} else if (key.matches("longTermStorageDirectory")) {
 	    longTermStorageDirectory = new File(value);

@@ -20,16 +20,12 @@ public class Game {
     protected int numberOfDirectlyAccessibleArchivedGames;
     protected String name;
     protected Turn currentTurn;
-    protected String archiveShema;
-    protected int archiveTurnNumberMinimumlength;
    
     
-    public Game(String name, String archiveShema, int archiveTurnNumberMinimumlength) {
+    public Game(String name) {
 	archivedTurns = new HashMap<>();
 	this.name = name;
 	currentTurn = null;
-	this.archiveTurnNumberMinimumlength = archiveTurnNumberMinimumlength;
-	this.archiveShema = archiveShema.replaceAll("%name%", name);
 	Main.logWriter.log("Creating new Game with Name: " + name);
     }
     
@@ -38,9 +34,7 @@ public class Game {
     }
     
     public void doArchiving() {
-	Main.logWriter.startNewSection("archiving");
-	this.currentTurn.archive();
-	
+	this.currentTurn.archive();	
     }
     
     public void doLongTimeStoraging() {
@@ -56,27 +50,28 @@ public class Game {
 	else if it matches gameName it is the current turn
 	else error
 	*/
-	String directoyName = newTurn.getDirectoryName();
-	String specificShemaExpectedTurnNumber = String.format("%1$" + archiveTurnNumberMinimumlength + "s", Integer.toString(newTurn.getTurnNumber())).replace(' ', '0');
-	String specificTurnArchiveShema = this.archiveShema.replaceAll("%turn%", specificShemaExpectedTurnNumber);
+	String directoryName = newTurn.getDirectoryName();
+	String specificTurnArchiveShema = newTurn.getNameOfArchiveDirectory();
 	Main.logWriter.log("Using specific turn archive shema " + specificTurnArchiveShema);
 	
-	Matcher currentGameNameMatcher = Pattern.compile(this.name).matcher(directoyName);
-	Matcher archiveShemaMatcher = Pattern.compile(specificTurnArchiveShema).matcher(directoyName);
+	Matcher currentGameNameMatcher = Pattern.compile(this.name).matcher(directoryName);
+	Matcher archiveShemaMatcher = Pattern.compile(specificTurnArchiveShema).matcher(directoryName);
 	
 	if(currentGameNameMatcher.matches()){
 	    if(this.currentTurn != null) {
-		Main.logWriter.error("Duplicate detected as current turn in directory name " + directoyName + " when registering turn " + newTurn.getTurnNumber() + " to game " + this.name);
+		Main.logWriter.error("Duplicate detected as current turn in directory name " + directoryName + " when registering turn " + newTurn.getTurnNumber() + " to game " + this.name);
 	    }
-	    Main.logWriter.log("Noting turn " + newTurn.getTurnNumber() + " in directory " + directoyName + " as current to game " + this.name);
+	    Main.logWriter.log("Noting turn " + newTurn.getTurnNumber() + " in directory " + directoryName + " as current to game " + this.name);
 	    this.currentTurn = newTurn;
 	}else if(archiveShemaMatcher.matches()){
 	    this.archivedTurns.put(newTurn.getTurnNumber(), newTurn);
 	}else {
-	    Main.logWriter.error("Could not interpret directory name " + directoyName + " when registering turn " + newTurn.getTurnNumber() + " to game " + this.name);
+	    Main.logWriter.error("Could not interpret directory name " + directoryName + " when registering turn " + newTurn.getTurnNumber() + " to game " + this.name);
 	}
 	
 	Main.logWriter.log("Registered turn " + newTurn.getTurnNumber() + " to game " + this.name);
     }
+    
+
     
 }
