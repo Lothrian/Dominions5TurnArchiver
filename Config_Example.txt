@@ -4,4 +4,4 @@ extractMapFiles=false
 
 readyArchiveDuration=5
 useLongTermStorage=true
-archiveNameShema = %name%_%turn%
+archiveNameSchema = %name%_%turn%

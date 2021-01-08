@@ -69,7 +69,7 @@ public class Turn {
     
     public String getNameOfArchiveDirectory() {
 	String specificShemaExpectedTurnNumber = String.format("%1$" + Main.archiveTurnNumberMinimumlength + "s", Integer.toString(this.getTurnNumber())).replace(' ', '0');
-	return Main.archiveNameShema.replaceAll("%turn%", specificShemaExpectedTurnNumber).replaceAll("%name%", this.gameName);
+	return Main.archiveNameSchema.replaceAll("%turn%", specificShemaExpectedTurnNumber).replaceAll("%name%", this.gameName);
     }
     
     private File findATurnFile() {

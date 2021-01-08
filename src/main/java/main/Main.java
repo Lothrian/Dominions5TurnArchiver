@@ -49,7 +49,7 @@ public class Main {
     private File saveDirectoryPath;
     private boolean extractMapFiles;
     private File mapDirectoryPath;
-    public static String archiveNameShema;
+    public static String archiveNameSchema;
     public static int archiveTurnNumberMinimumlength;
     private File longTermStorageDirectory;
     private int readyArchiveDuration = -1;
@@ -184,7 +184,7 @@ public class Main {
 	logWriter.log("readyArchiveDuration:" + this.readyArchiveDuration);
 	logWriter.log("saveDirectoryPath:" + this.saveDirectoryPath);
 	logWriter.log("useLongTermStorage:" + this.useLongTermStorage);
-	logWriter.log("archiveNameShema:" + this.archiveNameShema);
+	logWriter.log("archiveNameSchema:" + this.archiveNameSchema);
 	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberMinimumlength);
 	String acc = "";
 	for(String s : this.blacklist) {
@@ -218,7 +218,7 @@ public class Main {
 	this.readyArchiveDuration = -1;
 	this.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
 	this.useLongTermStorage = false;
-	this.archiveNameShema = "%name%%turn%";
+	this.archiveNameSchema = "%name%%turn%";
 	this.archiveTurnNumberMinimumlength = 2;
 	this.dominionsExecutablePath = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dominions5\\Dominions5.exe");
 	this.logInitialConfigs();
@@ -286,8 +286,8 @@ public class Main {
 	    if (!mapDirectoryPath.exists()) {
 		logWriter.error("MapDirectoryPath does not exist: " + mapDirectoryPath.getAbsolutePath());
 	    }
-	} else if (key.matches("archiveNameShema")) {
-	    archiveNameShema = value;
+	} else if (key.matches("archiveNameSchema")) {
+	    archiveNameSchema = value;
 	} else if (key.matches("longTermStorageDirectory")) {
 	    longTermStorageDirectory = new File(value);
 	    if (!longTermStorageDirectory.exists()) {

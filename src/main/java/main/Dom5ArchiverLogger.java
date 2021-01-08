@@ -42,7 +42,7 @@ public class Dom5ArchiverLogger {
 
 	    try {
 		logWriter = new FileWriter(logFile, false);
-		logWriter.write("Version:" + Main.version);
+		logWriter.write("Version:" + Main.version + System.getProperty("line.separator"));
 	    } catch (IOException ex) {
 		JOptionPane.showMessageDialog(errorMessagePanel, "Could not log file writer at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
 		System.exit(0);
