@@ -216,14 +216,14 @@ public class Main {
 	File defaultDominionsDataPath = new File(System.getenv("APPDATA") + "\\Dominions5");
 	this.blacklist = new ArrayList<>();
 	this.whitelist = new ArrayList<>();
-	this.mapFileExtractionModus = MapExtractionOption.never;
-	this.longTermStorageDirectory = null;
-	this.mapDirectoryPath = new File(defaultDominionsDataPath + "\\maps");
-	this.readyArchiveDuration = -1;
-	this.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
-	this.longTermStorageModus = LongTermStorageOption.deactivated;
-	this.archiveNameSchema = "%name%%turn%";
-	this.archiveTurnNumberAppendixMinimumLength = 2;
+	Main.mapFileExtractionModus = MapExtractionOption.never;
+	Main.longTermStorageDirectory = null;
+	Main.mapDirectoryPath = new File(defaultDominionsDataPath + "\\maps");
+	Main.readyArchiveDuration = -1;
+	Main.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
+	Main.longTermStorageModus = LongTermStorageOption.deactivated;
+	Main.archiveNameSchema = "%name%_%turn%";
+	Main.archiveTurnNumberAppendixMinimumLength = 2;
 	this.dominionsExecutablePath = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dominions5\\Dominions5.exe");
 	this.logInitialConfigs();
     }
@@ -294,6 +294,12 @@ public class Main {
 	    }
 	} else if (key.matches("archiveNameSchema")) {
 	    archiveNameSchema = value;
+	    if(!archiveNameSchema.contains("%name%")) {
+		archiveNameSchema = archiveNameSchema + "name";
+	    }
+	    if(!archiveNameSchema.contains("%turn%")) {
+		archiveNameSchema = archiveNameSchema + "turn";
+	    }
 	} else if (key.matches("longTermStorageDirectory")) {
 	    longTermStorageDirectory = new File(value);
 	    if (!longTermStorageDirectory.exists()) {

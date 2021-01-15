@@ -26,7 +26,11 @@ This comes packaged with a selection of scripts to ease use for the common user.
 Configfile options:
 Config entries follow the "key = value" format. They are all optional. They are case-sensitive.
 - dominionsExecutablePath: Path to the Dominions executable. Default: C:\Program Files (x86)\Steam\steamapps\common\Dominions5\Dominions5.exe
-- archiveNameSchema: schema for directories of archived games %name% is replaced with the game name, %turn% is replaced with the turn number
+- archiveNameSchema: schema for directories of archived games.
+    Textschema for how to name archive directories. Special sequences are %name% and %turn%.
+    %name% is replaced with the game name, %turn% is replaced with the turn number.
+    If not present in the given schema %name% and %turn% will internally be appended at the end. 
+    Default: %name%_%turn%
 - archiveTurnNumberMinimumlength: The minimum amount of characters used to denote turn number in archived games. Impacts sorting in the list ingame. Default:2
 - saveDirectoryPath: Path to the savedgames-directory if non-default
 - extractMapFiles: [never/cautious/force] Extract map files from the savegame directory to the  maps-directory to reduce disc usage. 
