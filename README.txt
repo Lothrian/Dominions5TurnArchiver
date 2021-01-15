@@ -82,7 +82,7 @@ As this program starts Dominions directly Steam is not involved. If for some rea
 
 
 -----------------------
-DOMINIONS 4:
+Dominions 4:
 This should work with Dominions4 if you adjust the paths accordingly without any problems. But I haven't tested so no guarantees
      (not that there are any guarantees anywhere else, but you know).
 Probably even for older iterations as long as Illwinter didn't change .trn formats or directory structure, but *shrug* even less than no guarantee.

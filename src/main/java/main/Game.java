@@ -7,6 +7,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,6 @@ import java.util.regex.Pattern;
 public class Game {
     
     protected HashMap<Integer, Turn> archivedTurns;
-    protected int numberOfDirectlyAccessibleArchivedGames;
     protected String name;
     protected Turn currentTurn;
    
@@ -35,10 +35,22 @@ public class Game {
     
     public void doArchiving() {
 	this.currentTurn.archive();	
+	if(Main.longTermStorageModus != LongTermStorageOption.deactivated) {  
+	    this.doLongTimeStoraging();
+	}
     }
     
     public void doLongTimeStoraging() {
-	
+	if(Main.readyArchiveDuration < 0) return;
+	int curTur = this.currentTurn.getTurnNumber();
+	Set<Integer> turns = archivedTurns.keySet();
+	for (Integer turn : turns) {
+	    if((curTur - turn) > Main.readyArchiveDuration){
+		Main.logWriter.log("Archiving turn: " + Integer.toString(turn) + " for game " + this.archivedTurns.get(turn).getGameName() + 
+			", latest turn " + Integer.toString(turn));
+		this.archivedTurns.get(turn).doLongTermStorage();
+	    }
+	}
     }
     
     public void registerTurn(Turn newTurn){

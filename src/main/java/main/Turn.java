@@ -53,14 +53,38 @@ public class Turn {
 	}
     }
 
-    public void moveToLongTimeStorage() {
+    public void doLongTermStorage() {
+	if (Main.longTermStorageModus == LongTermStorageOption.move) {
+	    try {
+		File targetDirectory = new File(Main.longTermStorageDirectory + "\\" + this.directory.getName());
+		Main.logWriter.log("Moving " + this.directory + " to LongtimeStorage " + targetDirectory);
+		copyFolder(this.directory, targetDirectory);
+	    } catch (IOException ex) {
+		Main.logWriter.error(ex.getMessage());
+	    }
+	} else if (Main.longTermStorageModus == LongTermStorageOption.delete) {
+	    Main.logWriter.log("Deleting " + this.directory + " because LongtimeStorage exceeded");
+	    File[] files = this.directory.listFiles();
+	    for (File file : files) {
+		try {
+		    Files.delete(file.toPath());
+		} catch (IOException ex) {
+		    Main.logWriter.error(ex.getMessage());
+		}
+	    }
+	    try {
+		Files.delete(this.directory.toPath());
+	    } catch (IOException ex) {
+		Main.logWriter.error(ex.getMessage());
+	    }
+	}
 
     }
 
     public boolean containsMapFile() {
 	return this.mapFiles.length > 0;
     }
-    
+
     protected final void identifyMapFiles() {
 	this.mapFiles = this.directory.listFiles(new FilenameFilter() {
 	    @Override
