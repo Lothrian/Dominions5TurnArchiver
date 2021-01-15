@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
  */
 public class Main {
 
-    public static String version = "1.0";
+    public static String version = "1.1";
     
     /*
 	Internals
@@ -46,14 +46,14 @@ public class Main {
     /*
 	Optional Options
      */
-    private File saveDirectoryPath;
-    private boolean extractMapFiles;
-    private File mapDirectoryPath;
+    public static File saveDirectoryPath;
+    public static MapExtractionOption mapFileExtractionModus;
+    public static File mapDirectoryPath;
     public static String archiveNameSchema;
-    public static int archiveTurnNumberMinimumlength;
-    private File longTermStorageDirectory;
-    private int readyArchiveDuration = -1;
-    private boolean useLongTermStorage ;
+    public static int archiveTurnNumberAppendixMinimumLength;
+    public static File longTermStorageDirectory;
+    public static int readyArchiveDuration = -1;
+    public static LongTermStorageOption longTermStorageModus;
 
     private ArrayList<String> whitelist;
     private ArrayList<String> blacklist;
@@ -160,7 +160,11 @@ public class Main {
 	ArrayList<Turn> turns = new ArrayList<>(directories.length);
 
 	for (File f : directories) {
-	    turns.add(new Turn(f));
+	    try {
+		turns.add(new Turn(f));
+	    } catch (NotATurnDirectoryException ex) {
+	    }
+	    
 	}
 
 	return turns;
@@ -178,14 +182,14 @@ public class Main {
     public void logConfigs() {
 	logWriter.log("archiverJarDirectory:" + this.archiverJarDirectory);
 	logWriter.log("dominionsExecutablePath:" + this.dominionsExecutablePath);
-	logWriter.log("extractMapFiles:" + this.extractMapFiles);
+	logWriter.log("extractMapFiles:" + Main.mapExtractionOptionToString(this.mapFileExtractionModus));
 	logWriter.log("longTermStorageDirectory:" + this.longTermStorageDirectory);
 	logWriter.log("mapDirectoryPath:" + this.mapDirectoryPath);
 	logWriter.log("readyArchiveDuration:" + this.readyArchiveDuration);
 	logWriter.log("saveDirectoryPath:" + this.saveDirectoryPath);
-	logWriter.log("useLongTermStorage:" + this.useLongTermStorage);
+	logWriter.log("useLongTermStorage:" + Main.longTermStorageOptionToString(this.longTermStorageModus));
 	logWriter.log("archiveNameSchema:" + this.archiveNameSchema);
-	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberMinimumlength);
+	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberAppendixMinimumLength);
 	String acc = "";
 	for(String s : this.blacklist) {
 	    acc += s + ";";
@@ -212,14 +216,14 @@ public class Main {
 	File defaultDominionsDataPath = new File(System.getenv("APPDATA") + "\\Dominions5");
 	this.blacklist = new ArrayList<>();
 	this.whitelist = new ArrayList<>();
-	this.extractMapFiles = false;
+	this.mapFileExtractionModus = MapExtractionOption.never;
 	this.longTermStorageDirectory = null;
 	this.mapDirectoryPath = new File(defaultDominionsDataPath + "\\maps");
 	this.readyArchiveDuration = -1;
 	this.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
-	this.useLongTermStorage = false;
+	this.longTermStorageModus = LongTermStorageOption.deactivated;
 	this.archiveNameSchema = "%name%%turn%";
-	this.archiveTurnNumberMinimumlength = 2;
+	this.archiveTurnNumberAppendixMinimumLength = 2;
 	this.dominionsExecutablePath = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dominions5\\Dominions5.exe");
 	this.logInitialConfigs();
     }
@@ -274,12 +278,14 @@ public class Main {
 		logWriter.error("SavefileDirectoryPath does not exist: " + saveDirectoryPath.getAbsolutePath());
 	    }
 	} else if (key.matches("extractMapFiles")) {
-	    if (value.matches("true")) {
-		extractMapFiles = true;
-	    } else if (value.matches("false")) {
-		extractMapFiles = false;
+	    if (value.matches("never")) {
+		mapFileExtractionModus = MapExtractionOption.never;
+	    } else if (value.matches("cautious")) {
+		mapFileExtractionModus = MapExtractionOption.cautious;
+	    } else if (value.matches("force")) {
+		mapFileExtractionModus = MapExtractionOption.force;
 	    } else {
-		logWriter.error("Could not interprete extractMapFiles, does not match either true or false: " + value);
+		logWriter.error("Could not interprete extractMapFiles, does not match never, cautious or force: " + value);
 	    }
 	} else if (key.matches("mapDirectoryPath")) {
 	    mapDirectoryPath = new File(value);
@@ -296,15 +302,17 @@ public class Main {
 	} else if (key.matches("readyArchiveDuration")) {
 	    readyArchiveDuration = Integer.parseInt(value);
 	} else if (key.matches("useLongTermStorage")) {
-	    if (value.matches("true")) {
-		useLongTermStorage = true;
-	    } else if (value.matches("false")) {
-		useLongTermStorage = false;
+	    if (value.matches("deactivated")) {
+		longTermStorageModus = LongTermStorageOption.deactivated;
+	    } else if (value.matches("move")) {
+		longTermStorageModus = LongTermStorageOption.move;
+	    } else if (value.matches("delete")) {
+		longTermStorageModus = LongTermStorageOption.delete;
 	    } else {
-		logWriter.error("Could not interprete useLongTermStorage, does not match either true or false: " + value);
+		logWriter.error("Could not interprete useLongTermStorage, does not match deactivated, move or delete: " + value);
 	    }
 	}else if (key.matches("archiveTurnNumberMinimumlength")) {
-	    this.archiveTurnNumberMinimumlength = Integer.parseInt(value);
+	    this.archiveTurnNumberAppendixMinimumLength = Integer.parseInt(value);
 	} else {
 	    logWriter.log("Could not identify key:" + key);
 	}
@@ -375,5 +383,23 @@ public class Main {
             }
         }
 	new Main().run(runGame, createLog);
+    }
+    
+    public static String mapExtractionOptionToString(MapExtractionOption option){
+	switch (option){
+	    case cautious: return "cautious";
+	    case force: return "force";
+	    case never: return "never";
+	}
+	return "ERROR mapExtractionOptionToString";	
+    }
+    
+    public static String longTermStorageOptionToString(LongTermStorageOption option){
+	switch (option){
+	    case deactivated: return "dactivated";
+	    case delete: return "delete";
+	    case move: return "move";
+	}
+	return "ERROR mapExtractionOptionToString";	
     }
 }

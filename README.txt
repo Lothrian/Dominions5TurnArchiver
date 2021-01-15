@@ -25,17 +25,25 @@ This comes packaged with a selection of scripts to ease use for the common user.
 -----------------------
 Configfile options:
 Config entries follow the "key = value" format. They are all optional. They are case-sensitive.
--dominionsExecutablePath: Path to the Dominions executable. Default: C:\Program Files (x86)\Steam\steamapps\common\Dominions5\Dominions5.exe
--archiveNameSchema: schema for directories of archived games %name% is replaced with the game name, %turn% is replaced with the turn number
--archiveTurnNumberMinimumlength: The minimum amount of characters used to denote turn number in archived games. Impacts sorting in the list ingame. Default:2
--saveDirectoryPath: Path to the savedgames-directory if non-default
-/Currently not active/-extractMapFiles: [true/false] wether map files hall be extracted and moved to the maps-directory, Default: false
--mapDirectoryPath: Path to the maps-directory if non-default, only used if extractMapFiles=true
-/Currently not active/-readyArchiveDuration: [number] maximum number of turn files held at ready for immediate access in the savedgames directory,
-     use -1 for all, Default: -1
-/Currently not active/-useLongTermStorage: [true/false] determines what is done with turns outdated according to readyArchiveDuration.
-     True means they will be moved to another directory, false means they will be unrecoverably deleted, CAUTION, Default: false
--longTermStorageDirectory: Path to the directory where outdated turns shall be archived. Only used when useLongTermStorage=true
+- dominionsExecutablePath: Path to the Dominions executable. Default: C:\Program Files (x86)\Steam\steamapps\common\Dominions5\Dominions5.exe
+- archiveNameSchema: schema for directories of archived games %name% is replaced with the game name, %turn% is replaced with the turn number
+- archiveTurnNumberMinimumlength: The minimum amount of characters used to denote turn number in archived games. Impacts sorting in the list ingame. Default:2
+- saveDirectoryPath: Path to the savedgames-directory if non-default
+- extractMapFiles: [never/cautious/force] Extract map files from the savegame directory to the  maps-directory to reduce disc usage. 
+    - "never" Do not extract map files
+    - "cautious" Will only do so if there is file with the same name already present in the map-directory. This may make it impossible to load older saves of completed
+        games if the map file has been overwritten in the meantime.
+    - "force" Forces the extraction even if there is already a file with the same name in the ma-directory. Highly dangerous, I do not recommend using this one.
+    Default: never
+- mapDirectoryPath: Path to the maps-directory if non-default, only used if extractMapFiles is either cautious or force
+- readyArchiveDuration: [number] maximum number of old turns per game held at ready for immediate access in the savedgames directory,
+     use -1 for no limit. Using this also requires setting the "useLongTermStorage"-option. Default: -1
+- useLongTermStorage: [move/delete/deactivated] determines what is done with turns outdated according to readyArchiveDuration.
+    - "move" means they will be moved to another directory, requires "longTermStorageDirectory"-option to be set
+    - "delete" means they will be UNRECOVERABLY deleted. 
+    - "deactivated" equal to readyArchiveDuration = -1. Safety mechanism.
+    Default: deactivated
+- longTermStorageDirectory: Path to the directory where outdated turns shall be archived. Only used when useLongTermStorage = "move"
 
 
 -----------------------

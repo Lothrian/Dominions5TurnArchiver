@@ -1,7 +1,7 @@
 
 dominionsExecutablePath=D:\Programme\Steam\steamapps\common\Dominions5\Dominions5.exe
-extractMapFiles=false
+extractMapFiles=cautious
 
 readyArchiveDuration=5
-useLongTermStorage=true
+useLongTermStorage=deactivated
 archiveNameSchema = %name%_%turn%
