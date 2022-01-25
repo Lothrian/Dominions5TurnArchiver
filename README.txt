@@ -48,6 +48,7 @@ Config entries follow the "key = value" format. They are all optional. They are 
     - "deactivated" equal to readyArchiveDuration = -1. Safety mechanism.
     Default: deactivated
 - longTermStorageDirectory: Path to the directory where outdated turns shall be archived. Only used when useLongTermStorage = "move"
+- dom5Arg: can contain arbitrary text which will be added as argument to the launched Dominions program
 
 
 -----------------------

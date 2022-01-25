@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -28,8 +29,9 @@ import javax.swing.JOptionPane;
  */
 public class Main {
 
-    public static String version = "1.1";
-    
+    public static String version = "1.3";
+    public static boolean expressiveDebugs = true;
+
     /*
 	Internals
      */
@@ -42,7 +44,7 @@ public class Main {
 	Required Options
      */
     private File dominionsExecutablePath;
-    
+
     /*
 	Optional Options
      */
@@ -54,6 +56,7 @@ public class Main {
     public static File longTermStorageDirectory;
     public static int readyArchiveDuration = -1;
     public static LongTermStorageOption longTermStorageModus;
+    public static String arbitraryDomArguments;
 
     private ArrayList<String> whitelist;
     private ArrayList<String> blacklist;
@@ -72,8 +75,10 @@ public class Main {
 	/*
 	    Execute game
 	 */
-	if(this.launchGame)runDominions();
-	
+	if (this.launchGame) {
+	    runDominions();
+	}
+
 	/*
 	    Read Turns from directories
 	 */
@@ -87,36 +92,43 @@ public class Main {
 	/*
 	    Go through games, Do Archiving
 	 */
-	for(Game game : games) {
+	for (Game game : games) {
 	    logWriter.startNewSection("ARCHIVING GAME " + game.getName());
-	    if(shallBeArchivedBasedOnBlackWhiteList(game)){
+	    if (shallBeArchivedBasedOnBlackWhiteList(game)) {
 		game.doArchiving();
 		Main.logWriter.log("Finished archiving game " + game.getName());
-	    }else {
+	    } else {
 		logWriter.log("Skipped because of black/whitelist");
 	    }
 	}
 	logWriter.startNewSection("FINISHED ARCHIVING SUCCESSFULLY");
     }
-    
+
     public boolean shallBeArchivedBasedOnBlackWhiteList(Game game) {
 	String gameName = game.getName();
 	for (int i = 0; i < blacklist.size(); i++) {
-            if (gameName.matches(blacklist.get(i))) {
-                return false;
-            }
-        }
+	    if (gameName.matches(blacklist.get(i))) {
+		Main.logWriter.log(gameName + " matches " + whitelist.get(i) + " from blacklist");
+		return false;
+	    }
+	}
+	if (blacklist.size() > 0) {
+	    Main.logWriter.log(gameName + " did not match any from blacklist");
+	}
 
-        if (whitelist.size() > 0) {
-            for (int i = 0; i < whitelist.size(); i++) {
-                if (gameName.matches(whitelist.get(i))) {
-                    return true;
-                }
-            }
-            return false;
-        }
+	if (whitelist.size() > 0) {
+	    for (int i = 0; i < whitelist.size(); i++) {
+		if (gameName.matches(whitelist.get(i))) {
+		    Main.logWriter.log(gameName + " matches " + whitelist.get(i) + " from whitelist");
+		    return true;
+		}
+	    }
+	    Main.logWriter.log(gameName + " did not match any from whitelist");
+	    return false;
+	}
 
-        return true;
+	Main.logWriter.log("No white/blacklist set");
+	return true;
     }
 
     public ArrayList<Game> generateGamesFromTurns(ArrayList<Turn> turns) {
@@ -164,7 +176,7 @@ public class Main {
 		turns.add(new Turn(f));
 	    } catch (NotATurnDirectoryException ex) {
 	    }
-	    
+
 	}
 
 	return turns;
@@ -176,7 +188,7 @@ public class Main {
     public void initialiseAdmin() {
 	archiverJarDirectory = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getParentFile();
 
-	logWriter = new Dom5ArchiverLogger(new File(archiverJarDirectory + "\\Log.txt"), this.createLog);
+	logWriter = new Dom5ArchiverLogger(getFileInArchiverDirectory("Log.txt"), this.createLog);
     }
 
     public void logConfigs() {
@@ -191,24 +203,44 @@ public class Main {
 	logWriter.log("archiveNameSchema:" + this.archiveNameSchema);
 	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberAppendixMinimumLength);
 	String acc = "";
-	for(String s : this.blacklist) {
+	for (String s : this.blacklist) {
 	    acc += s + ";";
 	}
 	logWriter.log("blacklist:" + acc);
 	acc = "";
-	for(String s : this.whitelist) {
+	for (String s : this.whitelist) {
 	    acc += s + ";";
 	}
 	logWriter.log("whitelist:" + acc);
+	if(Main.expressiveDebugs){
+	    String exacc = "";
+	    exacc += "archiverJarDirectory:" + this.archiverJarDirectory + "\n";
+	    exacc += "dominionsExecutablePath:" + this.dominionsExecutablePath + "\n";
+	    exacc += "extractMapFiles:" + Main.mapExtractionOptionToString(this.mapFileExtractionModus) + "\n";
+	    exacc += "longTermStorageDirectory:" + this.longTermStorageDirectory + "\n";
+	    exacc += "mapDirectoryPath:" + this.mapDirectoryPath + "\n";
+	    exacc += "readyArchiveDuration:" + this.readyArchiveDuration + "\n";
+	    exacc += "saveDirectoryPath:" + this.saveDirectoryPath + "\n";
+	    exacc += "useLongTermStorage:" + Main.longTermStorageOptionToString(this.longTermStorageModus) + "\n";
+	    exacc += "archiveNameSchema:" + this.archiveNameSchema + "\n";
+	    exacc += "archiveTurnNumberMinimumlength:" + this.archiveTurnNumberAppendixMinimumLength + "\n";
+	    JOptionPane.showMessageDialog(null, exacc);
+	}
     }
 
     private void logFinalConfigs() {
 	logWriter.startNewSection("FINAL CONFIGS");
+	if(Main.expressiveDebugs){
+	    JOptionPane.showMessageDialog(null, "Final Configs:");
+	}
 	this.logConfigs();
     }
 
     public void logInitialConfigs() {
 	logWriter.startNewSection("DEFAULT CONFIGS");
+	if(Main.expressiveDebugs){
+	    JOptionPane.showMessageDialog(null, "Default Configs:");
+	}
 	this.logConfigs();
     }
 
@@ -218,12 +250,13 @@ public class Main {
 	this.whitelist = new ArrayList<>();
 	Main.mapFileExtractionModus = MapExtractionOption.never;
 	Main.longTermStorageDirectory = null;
-	Main.mapDirectoryPath = new File(defaultDominionsDataPath + "\\maps");
+	Main.mapDirectoryPath = new File((defaultDominionsDataPath + "\\maps").replaceAll("%20", " "));
 	Main.readyArchiveDuration = -1;
-	Main.saveDirectoryPath = new File(defaultDominionsDataPath + "\\savedGames");
+	Main.saveDirectoryPath = new File((defaultDominionsDataPath + "\\savedGames").replaceAll("%20", " "));
 	Main.longTermStorageModus = LongTermStorageOption.deactivated;
 	Main.archiveNameSchema = "%name%_%turn%";
 	Main.archiveTurnNumberAppendixMinimumLength = 2;
+	Main.arbitraryDomArguments = "";
 	this.dominionsExecutablePath = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Dominions5\\Dominions5.exe");
 	this.logInitialConfigs();
     }
@@ -231,13 +264,16 @@ public class Main {
     public void readConfig() {
 	logWriter.startNewSection("READING CONFIG FILE");
 	this.readConfigFile();
-	this.readBlackWhitelist(whitelist, new File(archiverJarDirectory + "\\Whitelist.txt"));
-	this.readBlackWhitelist(blacklist, new File(archiverJarDirectory + "\\Blacklist.txt"));
+	this.readBlackWhitelist(whitelist, getFileInArchiverDirectory("Whitelist.txt"));
+	this.readBlackWhitelist(blacklist, getFileInArchiverDirectory("Blacklist.txt"));
 	this.logFinalConfigs();
     }
 
     public void readConfigFile() {
-	File configFile = new File(archiverJarDirectory + "\\Config.txt");
+	File configFile = getFileInArchiverDirectory("Config.txt");
+	if (!configFile.exists()) {
+	    logWriter.error("Could not find Config File at: " + configFile.getAbsolutePath());
+	}
 	Scanner read;
 
 	try {
@@ -252,16 +288,12 @@ public class Main {
 		    String key = matcher.group(1).trim();
 		    String value = matcher.group(2).trim();
 		    processConfigEntry(key, value);
-
 		} else {
 		    logWriter.log("Configfile line did not match expected pattern: " + line);
-
 		}
-
 	    }
-
 	} catch (FileNotFoundException ex) {
-	    logWriter.error("Could not find Config File at: " + configFile.getAbsolutePath());
+	    logWriter.error("Could not find Config File at: " + configFile.getAbsolutePath() + " (unexpected)");
 	}
     }
 
@@ -294,10 +326,10 @@ public class Main {
 	    }
 	} else if (key.matches("archiveNameSchema")) {
 	    archiveNameSchema = value;
-	    if(!archiveNameSchema.contains("%name%")) {
+	    if (!archiveNameSchema.contains("%name%")) {
 		archiveNameSchema = archiveNameSchema + "name";
 	    }
-	    if(!archiveNameSchema.contains("%turn%")) {
+	    if (!archiveNameSchema.contains("%turn%")) {
 		archiveNameSchema = archiveNameSchema + "turn";
 	    }
 	} else if (key.matches("longTermStorageDirectory")) {
@@ -317,21 +349,29 @@ public class Main {
 	    } else {
 		logWriter.error("Could not interprete useLongTermStorage, does not match deactivated, move or delete: " + value);
 	    }
-	}else if (key.matches("archiveTurnNumberMinimumlength")) {
-	    this.archiveTurnNumberAppendixMinimumLength = Integer.parseInt(value);
+	} else if (key.matches("archiveTurnNumberMinimumlength")) {
+	    Main.archiveTurnNumberAppendixMinimumLength = Integer.parseInt(value);
+	} else if(key.matches("dom5Arg")) {
+	    Main.arbitraryDomArguments = value;
 	} else {
 	    logWriter.log("Could not identify key:" + key);
 	}
     }
 
     public void sanityCheckConfigs() {
-	this.logWriter.startNewSection("CHECKING CONFIGS FOR DETECTED PROBLEMS");
+	Main.logWriter.startNewSection("CHECKING CONFIGS FOR DETECTED PROBLEMS");
 
 	this.checkExistence(this.dominionsExecutablePath, "DominionsExecutable");
 	this.checkExistence(this.saveDirectoryPath, "SaveFilesDirectory");
-	
+	if (Main.longTermStorageModus == LongTermStorageOption.move) {
+	    if (Main.longTermStorageDirectory == null) {
+		logWriter.error("longTermStorageModus is 'move', yet longTermStorageDirectory is not set");
+	    }
+	    this.checkExistence(longTermStorageDirectory, "longTermStorageDirectory");
+	}
+
     }
-    
+
     public void checkExistence(File toCheck, String name) {
 	if (toCheck == null) {
 	    logWriter.error(name + " not set");
@@ -361,12 +401,15 @@ public class Main {
      * Runs the Dominions application and waits for it to close
      */
     public void runDominions() {
-	Runtime run = Runtime.getRuntime();
+	//Runtime run = Runtime.getRuntime();
+	ProcessBuilder pb = new ProcessBuilder(dominionsExecutablePath.getAbsolutePath(), Main.arbitraryDomArguments);
 	Process proc = null;
 	try {
-	    proc = run.exec(dominionsExecutablePath.getAbsolutePath());
+	    proc = pb.start();
+	    //proc = run.exec(dominionsExecutablePath.getAbsolutePath());
 	} catch (IOException ex) {
 	    logWriter.error("Could not launch Dominions, is the path correct? " + ex.getMessage());
+	    return;
 	}
 	try {
 	    proc.waitFor();
@@ -376,36 +419,64 @@ public class Main {
     }
 
     public static void main(String[] args) {
+	if (Main.expressiveDebugs) {
+	    new JFrame().setVisible(true);
+	    JOptionPane.showMessageDialog(null, "Starting program");
+	}
 	boolean runGame = true;
 	boolean createLog = false;
 	for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-a")) {
-                runGame = false;
-                continue;
-            }
-            if (args[i].equals("-l")) {
-                createLog = true;
-                continue;
-            }
-        }
-	new Main().run(runGame, createLog);
-    }
-    
-    public static String mapExtractionOptionToString(MapExtractionOption option){
-	switch (option){
-	    case cautious: return "cautious";
-	    case force: return "force";
-	    case never: return "never";
+	    if (args[i].equals("-a")) {
+		runGame = false;
+		if (Main.expressiveDebugs) {
+		    JOptionPane.showMessageDialog(null, "Found argument -a");
+		}
+		continue;
+	    }
+	    if (args[i].equals("-l")) {
+		createLog = true;
+		if (Main.expressiveDebugs) {
+		    JOptionPane.showMessageDialog(null, "Found argument -l");
+		}
+		continue;
+	    }
 	}
-	return "ERROR mapExtractionOptionToString";	
-    }
-    
-    public static String longTermStorageOptionToString(LongTermStorageOption option){
-	switch (option){
-	    case deactivated: return "dactivated";
-	    case delete: return "delete";
-	    case move: return "move";
+	Main m = new Main();
+	if(Main.expressiveDebugs) {
+	    JOptionPane.showMessageDialog(null, "Finished creating Main object");
 	}
-	return "ERROR mapExtractionOptionToString";	
+	m.run(runGame, createLog);
+	if(Main.expressiveDebugs) {
+	    JOptionPane.showMessageDialog(null, "Finished and exiting program");
+	}
+	System.exit(0);
+    }
+
+    public static String mapExtractionOptionToString(MapExtractionOption option) {
+	switch (option) {
+	    case cautious:
+		return "cautious";
+	    case force:
+		return "force";
+	    case never:
+		return "never";
+	}
+	return "ERROR mapExtractionOptionToString";
+    }
+
+    public static String longTermStorageOptionToString(LongTermStorageOption option) {
+	switch (option) {
+	    case deactivated:
+		return "dactivated";
+	    case delete:
+		return "delete";
+	    case move:
+		return "move";
+	}
+	return "ERROR mapExtractionOptionToString";
+    }
+
+    public File getFileInArchiverDirectory(String name) {
+	return new File((archiverJarDirectory.getAbsolutePath() + "\\" + name).replaceAll("%20", " "));
     }
 }

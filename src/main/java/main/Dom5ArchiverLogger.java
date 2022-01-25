@@ -29,25 +29,27 @@ public class Dom5ArchiverLogger {
 	this.errorMessagePanel.setResizable(true);
 
 	this.active = active;
+	if (!active) {
+	    return;
+	}
 
-	if (active) {
-	    if (!logFile.exists()) {
-		try {
-		    logFile.createNewFile();
-		} catch (IOException ex) {
-		    JOptionPane.showMessageDialog(errorMessagePanel, "Could not create log file at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
-		    System.exit(0);
-		}
-	    }
-
+	if (!logFile.exists()) {
 	    try {
-		logWriter = new FileWriter(logFile, false);
-		logWriter.write("Version:" + Main.version + System.getProperty("line.separator"));
+		logFile.createNewFile();
 	    } catch (IOException ex) {
-		JOptionPane.showMessageDialog(errorMessagePanel, "Could not log file writer at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(errorMessagePanel, "Could not create log file at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
 		System.exit(0);
 	    }
 	}
+
+	try {
+	    logWriter = new FileWriter(logFile, false);
+	    logWriter.write("Version:" + Main.version + System.getProperty("line.separator"));
+	} catch (IOException ex) {
+	    JOptionPane.showMessageDialog(errorMessagePanel, "Could not log file writer at: " + logFile.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+	    System.exit(0);
+	}
+
     }
 
     public void log(String text) {
@@ -63,6 +65,9 @@ public class Dom5ArchiverLogger {
     }
 
     public void error(String text) {
+	if(Main.expressiveDebugs) {
+	    JOptionPane.showMessageDialog(null, text);
+	}
 	if (this.active) {
 	    this.log("ERROR: " + text);
 	    try {

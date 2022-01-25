@@ -41,15 +41,15 @@ public class Turn {
     }
 
     public void archive() {
+	if ((Main.mapFileExtractionModus != MapExtractionOption.never) && this.containsMapFile()) {
+	    this.extractMapFile(Main.mapDirectoryPath);
+	}
 	try {
 	    File archiveDirectory = new File(this.directory.getParent() + "\\" + this.getNameOfArchiveDirectory());
 	    Main.logWriter.log("Archiving " + this.directory + " to " + archiveDirectory);
 	    copyFolder(this.directory, archiveDirectory);
 	} catch (IOException ex) {
 	    Main.logWriter.error("failed to copy: " + ex.getMessage());
-	}
-	if ((Main.mapFileExtractionModus != MapExtractionOption.never) && this.containsMapFile()) {
-	    this.extractMapFile(Main.mapDirectoryPath);
 	}
     }
 
@@ -62,8 +62,14 @@ public class Turn {
 	    } catch (IOException ex) {
 		Main.logWriter.error(ex.getMessage());
 	    }
+	    this.deleteContainingDirectory();
 	} else if (Main.longTermStorageModus == LongTermStorageOption.delete) {
-	    Main.logWriter.log("Deleting " + this.directory + " because LongtimeStorage exceeded");
+	    this.deleteContainingDirectory();
+	}
+    }
+    
+    private void deleteContainingDirectory() {
+	Main.logWriter.log("Deleting " + this.directory + " because LongtimeStorage exceeded");
 	    File[] files = this.directory.listFiles();
 	    for (File file : files) {
 		try {
@@ -77,8 +83,6 @@ public class Turn {
 	    } catch (IOException ex) {
 		Main.logWriter.error(ex.getMessage());
 	    }
-	}
-
     }
 
     public boolean containsMapFile() {

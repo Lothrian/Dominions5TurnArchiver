@@ -1,0 +1,1 @@
+start D:\Programme\Steam\steamapps\common\Dominions5\Dominions5.exe --preexec "start /wait /b D:\Gamedata\Dominions_Manuals\Dom5Archiver\dom5Archiver.bat" --tcpserver testgamename
