@@ -34,6 +34,11 @@ public class Game {
     }
     
     public void doArchiving() {
+	Main.logWriter.log("Starting to archive game: " + this.name);
+	if(this.currentTurn == null) {
+	    Main.logWriter.log("No current turn found, therefore skipping.");
+	    return;
+	}
 	this.currentTurn.archive();	
 	if(Main.longTermStorageModus != LongTermStorageOption.deactivated) {  
 	    this.doLongTimeStoraging();

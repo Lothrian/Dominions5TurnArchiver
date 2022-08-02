@@ -8,29 +8,25 @@ package main;
 import static main.Main.logWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Writer;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 /**
  *
- * @author Rafael
+ * @author mergele
  */
 public class Main {
 
-    public static String version = "1.3";
-    public static boolean expressiveDebugs = true;
+    public static String version = "1.4";
+    public static boolean expressiveDebugs = false;
 
     /*
 	Internals
@@ -88,20 +84,40 @@ public class Main {
 	    Create games out of these Turns
 	 */
 	ArrayList<Game> games = generateGamesFromTurns(turns);
-
+	logWriter.startNewSection("Games currently found: " + games.size());
+	for (int i = 0; i < games.size(); i++) {
+	    logWriter.log(games.get(i).getName()); 
+	}
+	
 	/*
 	    Go through games, Do Archiving
 	 */
-	for (Game game : games) {
-	    logWriter.startNewSection("ARCHIVING GAME " + game.getName());
-	    if (shallBeArchivedBasedOnBlackWhiteList(game)) {
-		game.doArchiving();
-		Main.logWriter.log("Finished archiving game " + game.getName());
-	    } else {
-		logWriter.log("Skipped because of black/whitelist");
+	try{
+	    for (int i = 0; i < games.size(); i++) {
+		Game game =  games.get(i);
+		logWriter.startNewSection("ARCHIVING GAME " + game.getName());
+		if (shallBeArchivedBasedOnBlackWhiteList(game)) {
+		    game.doArchiving();
+		    Main.logWriter.log("Finished archiving game " + game.getName());
+		} else {
+		    logWriter.log("Skipped because of black/whitelist");
+		}
 	    }
+	    logWriter.startNewSection("Games currently found: " + games.size());
+	    for (int i = 0; i < games.size(); i++) {
+		logWriter.log(games.get(i).getName()); 
+	    }
+	    logWriter.startNewSection("FINISHED ARCHIVING SUCCESSFULLY");
+	}catch(Exception e) {
+	    logWriter.startNewSection("RAN INTO EXCEPTION WHILE ARCHIVING");
+	    logWriter.log(e.getMessage());
+	    StringWriter sw = new StringWriter();
+	    PrintWriter pw = new PrintWriter(sw);
+	    e.printStackTrace(pw);
+	    String sStackTrace = sw.toString(); // stack trace as a string
+	    logWriter.log(sStackTrace);
+	    throw e;
 	}
-	logWriter.startNewSection("FINISHED ARCHIVING SUCCESSFULLY");
     }
 
     public boolean shallBeArchivedBasedOnBlackWhiteList(Game game) {
@@ -202,6 +218,7 @@ public class Main {
 	logWriter.log("useLongTermStorage:" + Main.longTermStorageOptionToString(this.longTermStorageModus));
 	logWriter.log("archiveNameSchema:" + this.archiveNameSchema);
 	logWriter.log("archiveTurnNumberMinimumlength:" + this.archiveTurnNumberAppendixMinimumLength);
+	logWriter.log("arbitraryDomArgument:" + this.arbitraryDomArguments);
 	String acc = "";
 	for (String s : this.blacklist) {
 	    acc += s + ";";
